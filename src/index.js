@@ -46,7 +46,7 @@ const orbitInlineDecoder = (nodeName, node) => {
     };
   }
 };
-const orbitLinkDecoratorObject = {
+const orbitLinkDecorator = {
   strategy: (contentBlock, callback, contentState) => {
     contentBlock.findEntityRanges(character => {
       const entityKey = character.getEntity();
@@ -68,7 +68,7 @@ const orbitLinkDecoratorObject = {
     );
   },
 };
-const orbitLinkDecorator = new CompositeDecorator([orbitLinkDecoratorObject]);
+const orbitCompositeDecorator = new CompositeDecorator([orbitLinkDecorator]);
 
 const convertToHTML = editorContent =>
   draftToHtml(editorContent, null, null, (entity, text) => {
@@ -103,12 +103,12 @@ class Playground extends Component {
 
   constructor(props) {
     super(props);
-    const html = `Hello <a href="/wiki/articles/45" data-linktype="wiki" data-linkid="45">link</a> and image<div><img src="https://orbit.secoya.dk/rest/fileexplorer/filesystem/files/710/download" class="full-width" style="height: 649px;" data-news_image-file-id="710"><br></div>`;
-    // const html = `Hi <a href="/wiki/articles/45" data-linktype="wiki" data-linkid="45">link</a> and <a href="www.google.com">other</a>.`;
+    // const html = `Hello <a href="/wiki/articles/45" data-linktype="wiki" data-linkid="45">link</a> and image<div><img src="https://orbit.secoya.dk/rest/fileexplorer/filesystem/files/710/download" class="full-width" style="height: 649px;" data-news_image-file-id="710"><br></div>`;
+    const html = `Hi <a href="/wiki/articles/45" data-linktype="wiki" data-linkid="45">link</a> and <a href="www.google.com">other</a>.`;
     const contentBlock = htmlToDraft(html, orbitBlockDecoder, orbitInlineDecoder);
     if (contentBlock) {
       const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks, contentBlock.entityMap);
-      const inputEditorState = EditorState.createWithContent(contentState, orbitLinkDecorator);
+      const inputEditorState = EditorState.createWithContent(contentState, orbitCompositeDecorator);
       this.state = {
         inputEditorState,
       };
@@ -126,7 +126,7 @@ class Playground extends Component {
     // console.log('2', convertFromHTML(html) && convertFromHTML(html))
     if (contentBlock) {
       const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-      const outputEditorState = EditorState.createWithContent(contentState, orbitLinkDecorator);
+      const outputEditorState = EditorState.createWithContent(contentState, orbitCompositeDecorator);
       this.setState({
         inputEditorState,
         outputEditorState,
@@ -143,7 +143,7 @@ class Playground extends Component {
       <div>
         <div style={{ height: 200 }}>
           <Editor
-            customDecorators={[orbitLinkDecoratorObject]}
+            customDecorators={[orbitLinkDecorator]}
             editorState={this.state.inputEditorState}
             onEditorStateChange={this.onInputEditorChange}
           />
@@ -159,7 +159,7 @@ class Playground extends Component {
           />
         </div>
         <div style={{ height: 200 }}>
-          <Editor customDecorators={[orbitLinkDecoratorObject]} editorState={this.state.outputEditorState} />
+          <Editor customDecorators={[orbitLinkDecorator]} editorState={this.state.outputEditorState} />
         </div>
       </div>
     );
